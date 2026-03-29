@@ -7,8 +7,8 @@ export default function MPContactWidget({
   billTitle,
   billNumber,
 }: {
-  billTitle: string
-  billNumber: string
+  billTitle?: string
+  billNumber?: string
 }) {
   const [postalCode, setPostalCode] = useState('')
   const [mp, setMp] = useState<MPResult | null>(null)
@@ -34,10 +34,16 @@ export default function MPContactWidget({
 
   // Pre-fills a mailto with context about the bill so the user has a starting point
   function buildMailto(mp: MPResult) {
-    const subject = encodeURIComponent(`Re: ${billNumber} — ${billTitle}`)
-    const body = encodeURIComponent(
-      `Dear ${mp.name},\n\nI am writing to share my thoughts on ${billNumber} (${billTitle}), which is currently before Parliament.\n\n[Your message here]\n\nThank you for your service.\n\nSincerely,\n[Your name]\n[Your riding: ${mp.district}]`
-    )
+    const subject = billNumber && billTitle
+      ? encodeURIComponent(`Re: ${billNumber} — ${billTitle}`)
+      : encodeURIComponent('Message from a constituent')
+    const body = billNumber && billTitle
+      ? encodeURIComponent(
+          `Dear ${mp.name},\n\nI am writing to share my thoughts on ${billNumber} (${billTitle}), which is currently before Parliament.\n\n[Your message here]\n\nThank you for your service.\n\nSincerely,\n[Your name]\n[Your riding: ${mp.district}]`
+        )
+      : encodeURIComponent(
+          `Dear ${mp.name},\n\nI am writing as a constituent in ${mp.district}.\n\n[Your message here]\n\nThank you for your service.\n\nSincerely,\n[Your name]`
+        )
     return `mailto:${mp.email}?subject=${subject}&body=${body}`
   }
 
@@ -45,7 +51,7 @@ export default function MPContactWidget({
     <div className="bg-white rounded-xl border border-gray-200 p-4">
       <h3 className="font-semibold text-gray-800 text-sm mb-1">Contact Your MP</h3>
       <p className="text-xs text-gray-400 mb-3">
-        Enter your postal code to find your Member of Parliament.
+        Enter your postal code to find your Member of Parliament and open their contact details.
       </p>
 
       {!mp ? (

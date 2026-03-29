@@ -4,6 +4,14 @@ import React, { useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
 
+const NAV_ITEMS = [
+  { href: "/", label: "Home" },
+  { href: "/bills/trending", label: "Trending Bills" },
+  { href: "/mp", label: "Find Your MP" },
+  { href: "/bills/house", label: "House Bills" },
+  { href: "/bills/senate", label: "Senate Bills" },
+];
+
 export function ClientLayout({ children }: { children: React.ReactNode }) {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 
@@ -21,11 +29,11 @@ export function ClientLayout({ children }: { children: React.ReactNode }) {
         </button>
         <div className="flex items-center w-full max-w-5xl">
           <Image src="/logo.png" alt="Parliament Watch Logo" width={128} height={128} className="object-contain" />
-          <Link href="/" className="font-bold text-lg tracking-tight hover:text-red-700 transition-colors truncate -ml-16 relative z-10">
+          <Link href="/" className="font-bold text-lg tracking-tight hover:text-red-700 transition-colors truncate -ml-8 relative z-10">
             Parliament Watch
           </Link>
           <span className="text-gray-400 text-sm ml-auto hidden sm:inline-block truncate">
-            45th Parliament · Session 1 · Live data
+            45th Parliament · Live data
           </span>
         </div>
       </header>
@@ -51,31 +59,17 @@ export function ClientLayout({ children }: { children: React.ReactNode }) {
         >
           <nav className="flex-1 overflow-y-auto py-4">
             <ul className="space-y-1 px-3">
-              <li>
-                <Link href="/" onClick={() => setIsSidebarOpen(false)} className="block px-3 py-2 text-gray-700 hover:bg-red-50 hover:text-red-700 rounded-md transition-colors font-medium">
-                  Home
-                </Link>
-              </li>
-              <li>
-                <Link href="/bills/trending" onClick={() => setIsSidebarOpen(false)} className="block px-3 py-2 text-gray-700 hover:bg-red-50 hover:text-red-700 rounded-md transition-colors font-medium">
-                  Trending Bills
-                </Link>
-              </li>
-              <li>
-                <Link href="/mp" onClick={() => setIsSidebarOpen(false)} className="block px-3 py-2 text-gray-700 hover:bg-red-50 hover:text-red-700 rounded-md transition-colors font-medium">
-                  Find Your MP
-                </Link>
-              </li>
-              <li>
-                <Link href="/debates" onClick={() => setIsSidebarOpen(false)} className="block px-3 py-2 text-gray-700 hover:bg-red-50 hover:text-red-700 rounded-md transition-colors font-medium">
-                  Recent Debates
-                </Link>
-              </li>
-              <li>
-                <Link href="/votes" onClick={() => setIsSidebarOpen(false)} className="block px-3 py-2 text-gray-700 hover:bg-red-50 hover:text-red-700 rounded-md transition-colors font-medium">
-                  Latest Votes
-                </Link>
-              </li>
+              {NAV_ITEMS.map((item) => (
+                <li key={item.href}>
+                  <Link
+                    href={item.href}
+                    onClick={() => setIsSidebarOpen(false)}
+                    className="block px-3 py-2 text-gray-700 hover:bg-red-50 hover:text-red-700 rounded-md transition-colors font-medium"
+                  >
+                    {item.label}
+                  </Link>
+                </li>
+              ))}
             </ul>
           </nav>
           <div className="p-4 border-t border-gray-200 text-xs text-gray-500">
