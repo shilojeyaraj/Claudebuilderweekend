@@ -1,18 +1,31 @@
 import Anthropic from '@anthropic-ai/sdk'
-import { Bill } from '@/lib/types'
+import { Bill, UserInterests } from '@/lib/types'
 
 const client = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY })
 
 export async function POST(req: Request) {
-  const { messages, bill }: { messages: { role: 'user' | 'assistant'; content: string }[]; bill: Bill } =
-    await req.json()
+  const {
+    messages,
+    bill,
+    userInterests,
+  }: {
+    messages: { role: 'user' | 'assistant'; content: string }[]
+    bill: Bill
+    userInterests?: UserInterests
+  } = await req.json()
 
-  // Inject bill data into the system prompt so Claude only reasons over verified facts
+  // Build the interests block only when topics are provided
+  const interestsBlock =
+    userInterests?.topics?.length
+      ? `\nThe user has indicated they care especially about: ${userInterests.topics.join(', ')}. Where relevant, connect your explanation to those areas.`
+      : ''
+
   const systemPrompt = `You are a nonpartisan civic assistant embedded in a Canadian Parliament bill tracker. Your job is to help Canadians understand what their Parliament is doing — in plain language, without bias.
 
 You have been given the following bill data from the official Parliament of Canada LEGISinfo records:
 
 ${JSON.stringify(bill, null, 2)}
+${interestsBlock}
 
 Guidelines:
 - Explain bills clearly and simply, as if to a smart friend who isn't a lawyer

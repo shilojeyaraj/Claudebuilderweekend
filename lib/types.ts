@@ -46,3 +46,11 @@ export interface MPResult {
   url: string
   photo_url: string | null
 }
+
+/**
+ * Topics a user has flagged as interests.
+ * Injected into the Claude system prompt to surface relevant context.
+ */
+export interface UserInterests {
+  topics: string[]
+}
