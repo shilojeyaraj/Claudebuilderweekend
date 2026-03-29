@@ -14,24 +14,22 @@ export default function BillListingPage({
   emptyMessage: string
 }) {
   return (
-    <div className="max-w-5xl mx-auto px-4 py-8">
-      <Link href="/" className="text-sm text-gray-400 hover:text-red-600 transition-colors mb-6 inline-block">
+    <div className="ui-page">
+      <Link href="/" className="ui-link mb-6 inline-block">
         ← All Bills
       </Link>
 
       <div className="mb-8">
-        <h1 className="text-3xl font-bold text-gray-900 mb-2">{title}</h1>
-        <p className="text-gray-500 max-w-3xl">{description}</p>
+        <h1 className="ui-page-title">{title}</h1>
+        <p className="ui-hero-sub max-w-3xl">{description}</p>
       </div>
 
-      <p className="text-sm text-gray-400 mb-4">
+      <p className="ui-muted-count mb-4">
         Showing {bills.length} {bills.length === 1 ? 'bill' : 'bills'}
       </p>
 
       {bills.length === 0 ? (
-        <div className="bg-white rounded-xl border border-dashed border-gray-300 px-6 py-12 text-center text-gray-400">
-          {emptyMessage}
-        </div>
+        <div className="ui-dashed-empty">{emptyMessage}</div>
       ) : (
         <div className="grid gap-4">
           {bills.map((bill) => (

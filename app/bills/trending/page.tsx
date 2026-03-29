@@ -1,13 +1,13 @@
 import BillListingPage from '@/components/BillListingPage'
-import { getAllBills } from '@/lib/bills'
+import { getBills } from '@/lib/legisinfo'
 
 const TRENDING_LOOKBACK_DAYS = 30
 
-export default function TrendingBillsPage() {
+export default async function TrendingBillsPage() {
   const cutoff = new Date()
   cutoff.setDate(cutoff.getDate() - TRENDING_LOOKBACK_DAYS)
 
-  const bills = getAllBills().filter(
+  const bills = (await getBills()).filter(
     (bill) => new Date(bill.LatestBillEventDateTime) >= cutoff
   )
 

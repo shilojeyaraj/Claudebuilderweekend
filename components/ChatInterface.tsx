@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useRef, useEffect } from 'react'
+import ReactMarkdown from 'react-markdown'
 import { Bill } from '@/lib/types'
 
 interface Message {
@@ -34,7 +35,6 @@ export default function ChatInterface({ bill }: { bill: Bill }) {
     setInput('')
     setIsLoading(true)
 
-    // Optimistically add empty assistant message, then stream into it
     setMessages((prev) => [...prev, { role: 'assistant', content: '' }])
 
     try {
@@ -78,14 +78,14 @@ export default function ChatInterface({ bill }: { bill: Bill }) {
 
   return (
     <div className="flex flex-col gap-3">
-      {/* Suggested questions — shown only before first message */}
       {messages.length === 0 && (
         <div className="flex flex-wrap gap-2">
           {SUGGESTED_QUESTIONS.map((q) => (
             <button
               key={q}
+              type="button"
               onClick={() => sendMessage(q)}
-              className="text-xs bg-gray-50 hover:bg-red-50 hover:text-red-700 border border-gray-200 hover:border-red-200 rounded-full px-3 py-1.5 transition-colors"
+              className="ui-suggest-chip"
             >
               {q}
             </button>
@@ -93,28 +93,66 @@ export default function ChatInterface({ bill }: { bill: Bill }) {
         </div>
       )}
 
-      {/* Message history */}
       {messages.length > 0 && (
-        <div className="space-y-3 max-h-80 overflow-y-auto pr-1">
+        <div className="space-y-3 max-h-80 overflow-y-auto pr-1 [scrollbar-width:thin]">
           {messages.map((msg, i) => (
             <div
               key={i}
               className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}
             >
               <div
-                className={`max-w-[85%] rounded-xl px-4 py-2.5 text-sm leading-relaxed whitespace-pre-wrap ${
+                className={`max-w-[85%] px-4 py-2.5 text-sm leading-relaxed ${
                   msg.role === 'user'
-                    ? 'bg-red-600 text-white rounded-br-sm'
-                    : 'bg-gray-100 text-gray-800 rounded-bl-sm'
+                    ? 'ui-chat-user whitespace-pre-wrap'
+                    : 'ui-chat-assistant'
                 }`}
               >
-                {msg.content}
-                {msg.role === 'assistant' && msg.content === '' && isLoading && (
-                  <span className="inline-flex gap-1">
-                    <span className="animate-bounce">·</span>
-                    <span className="animate-bounce" style={{ animationDelay: '0.1s' }}>·</span>
-                    <span className="animate-bounce" style={{ animationDelay: '0.2s' }}>·</span>
-                  </span>
+                {msg.role === 'assistant' ? (
+                  msg.content === '' && isLoading ? (
+                    <span className="inline-flex gap-1">
+                      <span className="animate-bounce">·</span>
+                      <span className="animate-bounce" style={{ animationDelay: '0.1s' }}>·</span>
+                      <span className="animate-bounce" style={{ animationDelay: '0.2s' }}>·</span>
+                    </span>
+                  ) : (
+                    <ReactMarkdown
+                      components={{
+                        h1: ({ children }) => (
+                          <p className="font-bold text-base mt-2 mb-1 text-[var(--ui-text)]">{children}</p>
+                        ),
+                        h2: ({ children }) => (
+                          <p className="font-bold mt-2 mb-1 text-[var(--ui-text)]">{children}</p>
+                        ),
+                        h3: ({ children }) => (
+                          <p className="font-semibold mt-1.5 mb-0.5 text-[var(--ui-text)]">{children}</p>
+                        ),
+                        strong: ({ children }) => (
+                          <strong className="font-semibold text-[var(--ui-text)]">{children}</strong>
+                        ),
+                        ul: ({ children }) => (
+                          <ul className="list-disc list-inside space-y-0.5 my-1 text-[var(--ui-text)]">{children}</ul>
+                        ),
+                        ol: ({ children }) => (
+                          <ol className="list-decimal list-inside space-y-0.5 my-1 text-[var(--ui-text)]">{children}</ol>
+                        ),
+                        li: ({ children }) => (
+                          <li className="leading-snug">{children}</li>
+                        ),
+                        p: ({ children }) => (
+                          <p className="mb-1.5 last:mb-0 text-[var(--ui-chat-bot-fg)]">{children}</p>
+                        ),
+                        a: ({ href, children }) => (
+                          <a href={href} target="_blank" rel="noopener noreferrer" className="ui-md-link">
+                            {children}
+                          </a>
+                        ),
+                      }}
+                    >
+                      {msg.content}
+                    </ReactMarkdown>
+                  )
+                ) : (
+                  msg.content
                 )}
               </div>
             </div>
@@ -123,7 +161,6 @@ export default function ChatInterface({ bill }: { bill: Bill }) {
         </div>
       )}
 
-      {/* Input */}
       <form
         onSubmit={(e) => {
           e.preventDefault()
@@ -137,12 +174,12 @@ export default function ChatInterface({ bill }: { bill: Bill }) {
           onChange={(e) => setInput(e.target.value)}
           placeholder="Ask anything about this bill…"
           disabled={isLoading}
-          className="flex-1 border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-red-300 disabled:opacity-50"
+          className="ui-input flex-1 disabled:opacity-50"
         />
         <button
           type="submit"
           disabled={isLoading || !input.trim()}
-          className="bg-red-600 hover:bg-red-700 disabled:opacity-40 text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors"
+          className="ui-btn-primary shrink-0"
         >
           Ask
         </button>

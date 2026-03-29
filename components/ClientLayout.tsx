@@ -3,6 +3,7 @@
 import React, { useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
+import { ThemeSwitcher } from "@/components/ThemeSwitcher";
 
 const NAV_ITEMS = [
   { href: "/", label: "Home" },
@@ -16,42 +17,71 @@ export function ClientLayout({ children }: { children: React.ReactNode }) {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 
   return (
-    <div className="flex flex-col min-h-screen">
-      <header className="bg-white border-b border-gray-200 sticky top-0 z-30 flex flex-row items-center px-4 py-3 gap-3">
+    <div className="ui-app-frame flex flex-col min-h-screen">
+      <header className="ui-header sticky top-0 z-30 flex flex-row items-center px-3 sm:px-4 py-2.5 sm:py-3 gap-2 sm:gap-3 flex-wrap">
         <button
+          type="button"
           onClick={() => setIsSidebarOpen(!isSidebarOpen)}
-          className="p-1.5 rounded-md hover:bg-gray-100 transition-colors mr-2 focus:outline-none focus:ring-2 focus:ring-red-500 flex-shrink-0"
-          aria-label="Toggle Sidebar"
+          className="ui-menu-toggle flex-shrink-0"
+          aria-label="Toggle sidebar"
+          aria-expanded={isSidebarOpen}
         >
-          <svg className="w-6 h-6 text-gray-700" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
+          <svg
+            className="w-6 h-6"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+            xmlns="http://www.w3.org/2000/svg"
+            aria-hidden
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth={2}
+              d="M4 6h16M4 12h16M4 18h16"
+            />
           </svg>
         </button>
-        <div className="flex items-center w-full max-w-5xl">
-          <Image src="/logo.png" alt="Parliament Watch Logo" width={128} height={128} className="object-contain" />
-          <Link href="/" className="font-bold text-lg tracking-tight hover:text-red-700 transition-colors truncate -ml-8 relative z-10">
-            Parliament Watch
-          </Link>
-          <span className="text-gray-400 text-sm ml-auto hidden sm:inline-block truncate">
-            45th Parliament · Live data
-          </span>
+
+        <div className="flex flex-1 flex-col gap-2 min-w-0 sm:flex-row sm:items-center sm:gap-4">
+          <div className="flex items-center min-w-0 gap-1">
+            <Image
+              src="/logo.png"
+              alt=""
+              width={112}
+              height={112}
+              className="object-contain w-24 h-24 sm:w-28 sm:h-28 -mr-6 sm:-mr-8 shrink-0"
+            />
+            <Link
+              href="/"
+              className="font-bold text-base sm:text-lg tracking-tight hover:opacity-90 transition-opacity truncate relative z-10"
+              style={{ fontFamily: "var(--font-display-stack)" }}
+            >
+              Parliament Watch
+            </Link>
+          </div>
+
+          <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-4 sm:ml-auto w-full sm:w-auto min-w-0">
+            <ThemeSwitcher />
+            <span className="ui-legal whitespace-nowrap hidden lg:inline opacity-80">
+              45th Parliament · Live data
+            </span>
+          </div>
         </div>
       </header>
-      
+
       <div className="flex flex-1 overflow-hidden relative">
-        {/* Sidebar backdrop for mobile */}
         {isSidebarOpen && (
-          <div 
-            className="absolute inset-0 bg-black/20 z-10 md:hidden"
+          <div
+            className="absolute inset-0 bg-black/25 z-10 md:hidden"
+            aria-hidden
             onClick={() => setIsSidebarOpen(false)}
           />
         )}
-        
-        {/* Sidebar */}
-        <aside 
+
+        <aside
           className={`
-            absolute md:static inset-y-0 left-0 z-20 
-            bg-white border-r border-gray-200 
+            ui-sidebar absolute md:static inset-y-0 left-0 z-20 
             transition-all duration-300 ease-in-out
             overflow-hidden flex flex-col
             ${isSidebarOpen ? "w-64 translate-x-0" : "w-64 -translate-x-full md:translate-x-0 md:w-0 md:opacity-0 md:border-none"}
@@ -64,7 +94,7 @@ export function ClientLayout({ children }: { children: React.ReactNode }) {
                   <Link
                     href={item.href}
                     onClick={() => setIsSidebarOpen(false)}
-                    className="block px-3 py-2 text-gray-700 hover:bg-red-50 hover:text-red-700 rounded-md transition-colors font-medium"
+                    className="ui-nav-link"
                   >
                     {item.label}
                   </Link>
@@ -72,19 +102,22 @@ export function ClientLayout({ children }: { children: React.ReactNode }) {
               ))}
             </ul>
           </nav>
-          <div className="p-4 border-t border-gray-200 text-xs text-gray-500">
+          <div className="p-4 border-t border-[var(--ui-sidebar-border)] ui-legal">
             <p>Data sourced from LEGISinfo API.</p>
           </div>
         </aside>
 
-        {/* Main Content */}
-        <main className="flex-1 overflow-y-auto">
+        <main className="flex-1 overflow-y-auto flex flex-col">
           {children}
-          
-          <footer className="border-t border-gray-200 bg-white mt-12">
-            <div className="max-w-5xl mx-auto px-4 py-6 text-sm text-gray-500 flex flex-col sm:flex-row gap-4 justify-between">
-              <span>Data sourced from the official Parliament of Canada LEGISinfo API.</span>
-              <span>AI summaries are for informational purposes only — not legal advice.</span>
+
+          <footer className="ui-footer mt-auto">
+            <div className="max-w-5xl mx-auto px-4 py-6 ui-legal flex flex-col sm:flex-row gap-4 justify-between">
+              <span>
+                Data sourced from the official Parliament of Canada LEGISinfo API.
+              </span>
+              <span>
+                AI summaries are for informational purposes only — not legal advice.
+              </span>
             </div>
           </footer>
         </main>

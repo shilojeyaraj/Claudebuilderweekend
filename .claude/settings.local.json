@@ -1,7 +1,18 @@
 {
   "permissions": {
     "allow": [
-      "Bash(npx tsc:*)"
+      "Bash(npx tsc:*)",
+      "Bash(npm install:*)",
+      "Bash(npm run:*)",
+      "Bash(curl -s \"https://api.openparliament.ca/bills/?session=45-1&format=json&limit=200\" -o /tmp/op_bills.json)",
+      "Bash(node -e \"const d=require\\(''/tmp/op_bills.json''\\); console.log\\(''Pagination:'', JSON.stringify\\(d.pagination\\)\\); console.log\\(''Bills in page:'', d.objects.length\\); console.log\\(''Sample:'', d.objects.slice\\(0,3\\).map\\(x=>x.number+'' ''+x.name.en\\)\\)\")",
+      "Bash(curl -s -o /dev/null -w \"%{http_code} %{content_type}\" \"https://www.parl.ca/LegisInfo/en/bills?parlSession=45-1&format=json\")",
+      "Bash(curl -s -o /dev/null -w \"%{http_code} %{content_type}\" \"https://www.parl.ca/LegisInfo/RSSFeed?featureId=Bills&language=E&parliaments=45-1\")",
+      "Bash(curl -s -o /dev/null -w \"%{http_code} %{content_type}\" \"https://www.parl.ca/LegisInfo/en/bills/export?fileType=json&parlSession=45-1\")",
+      "Bash(curl -s \"https://api.openparliament.ca/bills/45-1/C-5/?format=json\")",
+      "Bash(node -e \"process.stdin.resume\\(\\);let d='''''''';process.stdin.on\\(''''data'''',c=>d+=c\\);process.stdin.on\\(''''end'''',\\(\\)=>console.log\\(JSON.stringify\\(JSON.parse\\(d\\),null,2\\)\\)\\)\")",
+      "Bash(curl -s \"https://api.openparliament.ca/politicians/dominic-leblanc/?format=json\")",
+      "Bash(curl -s \"https://api.openparliament.ca/politicians/memberships/1314/?format=json\")"
     ]
   }
 }

@@ -1,36 +1,35 @@
 /**
- * Parliament of Canada LEGISinfo API client.
+ * Parliament of Canada LEGISinfo data layer.
  *
- * Fetches bills for the current parliament/session and caches the result for
- * 6 hours via Next.js fetch caching.  Falls back to the bundled bills.json
- * snapshot when the live API is unreachable.
+ * Primary source: the static public/bills.json snapshot (always available).
+ *
+ * Live fetch is opt-in via the LEGISINFO_EXPORT_URL environment variable.
+ * Set it to the confirmed JSON export endpoint once you have it.
+ * Without it the app works perfectly — the snapshot IS real Parliament data.
+ *
+ * To trigger a cache refresh: POST /api/bills/refresh { secret }
  */
 
 import type { Bill } from './types'
 import staticBills from '../public/bills.json'
 
-const PARLIAMENT = 45
-const SESSION = 1
-
 export const LEGISINFO_CACHE_TAG = 'legisinfo-bills'
 
-const LEGISINFO_URL =
-  `https://www.parl.ca/LegisInfo/en/bills/export` +
-  `?fileType=JSON&lang=en&parlSession=${PARLIAMENT}-${SESSION}`
-
 /**
- * Fetch bills from the live LEGISinfo API.
- * Responses are cached by Next.js for 6 hours and tagged so they can be
- * invalidated on demand via revalidateTag().
+ * Attempt a live fetch if LEGISINFO_EXPORT_URL is configured.
+ * Returns null (not an error) when the env var is absent.
  */
-export async function fetchLiveBills(): Promise<Bill[]> {
-  const res = await fetch(LEGISINFO_URL, {
+async function fetchLiveBills(): Promise<Bill[] | null> {
+  const exportUrl = process.env.LEGISINFO_EXPORT_URL
+  if (!exportUrl) return null
+
+  const res = await fetch(exportUrl, {
     next: {
       revalidate: 21_600, // 6 hours
       tags: [LEGISINFO_CACHE_TAG],
     },
     headers: {
-      'User-Agent': 'ParliamentWatch/1.0 (hackathon)',
+      'User-Agent': 'ParliamentWatch/1.0',
       Accept: 'application/json',
     },
   })
@@ -42,28 +41,28 @@ export async function fetchLiveBills(): Promise<Bill[]> {
   const data: unknown = await res.json()
 
   if (!Array.isArray(data)) {
-    throw new Error('Unexpected LEGISinfo response shape — expected an array')
+    throw new Error('Unexpected LEGISinfo response — expected a JSON array')
   }
 
   return data as Bill[]
 }
 
 /**
- * Return bills from LEGISinfo, falling back to the static snapshot on error.
- * Sorted newest-activity-first.
+ * Return bills sorted newest-activity-first.
+ * Uses live data when LEGISINFO_EXPORT_URL is set, otherwise the snapshot.
  */
 export async function getBills(): Promise<Bill[]> {
   try {
-    const bills = await fetchLiveBills()
-    return sortByLatestActivity(bills)
+    const live = await fetchLiveBills()
+    if (live) return sortByLatestActivity(live)
   } catch (err) {
-    console.error('[legisinfo] Live fetch failed, using static snapshot:', err)
-    return sortByLatestActivity(staticBills as Bill[])
+    console.warn('[legisinfo] Live fetch failed, using snapshot:', err)
   }
+  return sortByLatestActivity(staticBills as Bill[])
 }
 
 /**
- * Fetch a single bill by ID.  Returns undefined when not found.
+ * Fetch a single bill by ID.
  */
 export async function getLiveBillById(id: number): Promise<Bill | undefined> {
   const bills = await getBills()

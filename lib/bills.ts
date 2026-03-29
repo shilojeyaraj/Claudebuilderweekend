@@ -46,13 +46,40 @@ export const TOPIC_TAGS = [
   'Other',
 ]
 
-// Maps a status string to a visual badge colour class (Tailwind)
-export function getStatusColor(status: string): string {
+export type BillStatusStage =
+  | 'assented'
+  | 'third'
+  | 'second'
+  | 'committee'
+  | 'first'
+  | 'default'
+
+/** Normalised stage for themed UI badges and API consumers. */
+export function getStatusStage(status: string): BillStatusStage {
   const s = status.toLowerCase()
-  if (s.includes('royal assent')) return 'bg-green-100 text-green-800'
-  if (s.includes('third reading')) return 'bg-blue-100 text-blue-800'
-  if (s.includes('second reading')) return 'bg-yellow-100 text-yellow-800'
-  if (s.includes('committee')) return 'bg-purple-100 text-purple-800'
-  if (s.includes('first reading')) return 'bg-gray-100 text-gray-700'
-  return 'bg-gray-100 text-gray-600'
+  if (s.includes('royal assent')) return 'assented'
+  if (s.includes('third reading')) return 'third'
+  if (s.includes('second reading')) return 'second'
+  if (s.includes('committee')) return 'committee'
+  if (s.includes('first reading')) return 'first'
+  return 'default'
+}
+
+/** Semantic classes — pair with globals.css theme tokens. */
+export function getStatusBadgeClass(status: string): string {
+  return `ui-status ui-status--${getStatusStage(status)}`
+}
+
+/** @deprecated Prefer getStatusBadgeClass in UI; kept for JSON API responses. */
+export function getStatusColor(status: string): string {
+  const stage = getStatusStage(status)
+  const map: Record<BillStatusStage, string> = {
+    assented: 'bg-green-100 text-green-800',
+    third: 'bg-blue-100 text-blue-800',
+    second: 'bg-yellow-100 text-yellow-800',
+    committee: 'bg-purple-100 text-purple-800',
+    first: 'bg-gray-100 text-gray-700',
+    default: 'bg-gray-100 text-gray-600',
+  }
+  return map[stage]
 }

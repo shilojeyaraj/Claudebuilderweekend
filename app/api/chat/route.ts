@@ -20,21 +20,41 @@ export async function POST(req: Request) {
       ? `\nThe user has indicated they care especially about: ${userInterests.topics.join(', ')}. Where relevant, connect your explanation to those areas.`
       : ''
 
+  // Build a compact, readable bill summary for the system prompt
+  const billContext = [
+    `Number: ${bill.NumberCode}`,
+    `Short title: ${bill.ShortTitleEn || '(none)'}`,
+    `Long title: ${bill.LongTitleEn}`,
+    bill.ShortLegislativeSummaryEn
+      ? `Legislative summary: ${bill.ShortLegislativeSummaryEn}`
+      : null,
+    `Status: ${bill.StatusNameEn}`,
+    `Current stage: ${bill.LatestCompletedMajorStageNameEn || bill.OngoingStageNameEn || 'Unknown'}`,
+    `Sponsor: ${bill.SponsorPersonName}${bill.SponsorAffiliationTitle ? ` (${bill.SponsorAffiliationTitle})` : ''}`,
+    `Originating chamber: ${bill.OriginatingChamberNameEn}`,
+    `Parliament: ${bill.ParliamentNumber}-${bill.SessionNumber}`,
+    `Government bill: ${bill.IsGovernmentBill ? 'Yes' : 'No'}`,
+    bill.ReceivedRoyalAssent ? `Royal Assent: ${bill.ReceivedRoyalAssentDateTime}` : null,
+  ]
+    .filter(Boolean)
+    .join('\n')
+
   const systemPrompt = `You are a nonpartisan civic assistant embedded in a Canadian Parliament bill tracker. Your job is to help Canadians understand what their Parliament is doing — in plain language, without bias.
 
-You have been given the following bill data from the official Parliament of Canada LEGISinfo records:
+Here is the official data for the bill the user is asking about:
 
-${JSON.stringify(bill, null, 2)}
+${billContext}
 ${interestsBlock}
 
-Guidelines:
-- Explain bills clearly and simply, as if to a smart friend who isn't a lawyer
-- When there are competing perspectives on a bill, present them fairly and without judgment
-- Never tell the user how to vote, which party is right, or whether a bill is good or bad
-- If you don't know something, say so and point to the official Parliament of Canada website (parl.ca)
-- Always clarify that you are an AI assistant and that official sources should be consulted for legal or political decisions
-- Be warm, accessible, and respectful of the user's ability to form their own opinion
-- Do not make up details about the bill that are not present in the data above`
+Instructions:
+- Explain what the bill does based on its title, long title, and legislative summary (when available). Do not say "based on the title" — just explain what you know clearly and directly.
+- When the legislative summary is present, use it as your primary source of detail.
+- When only the title is available, reason carefully from the wording of the long title — it is the official legal description and usually contains enough to give a solid plain-language explanation.
+- If there are competing perspectives on a bill, present them fairly and without judgment.
+- Never tell the user how to vote, which party is right, or whether a bill is good or bad.
+- If asked something you genuinely cannot answer from this data, say so and point to parl.ca.
+- Be warm, accessible, and concise. Use markdown formatting (headers, bullet points, bold) to structure longer responses.
+- Do not make up details not present in the data above.`
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   let stream: any

@@ -25,30 +25,28 @@ export default function Home() {
   }, [bills, topic, search])
 
   return (
-    <div className="max-w-5xl mx-auto px-4 py-8">
-      {/* Hero */}
+    <div className="ui-page">
       <div className="mb-8">
-        <h1 className="text-3xl font-bold text-gray-900 mb-2">
+        <h1 className="ui-hero-title">
           What is Parliament working on right now?
         </h1>
-        <p className="text-gray-500 max-w-2xl">
+        <p className="ui-hero-sub">
           A nonpartisan tracker of active bills in the Canadian House of Commons and Senate.
         </p>
       </div>
 
-      {/* Filters */}
-      <div className="bg-white rounded-xl border border-gray-200 p-4 mb-6 flex flex-col sm:flex-row gap-3">
+      <div className="ui-card ui-card-pad ui-filter-bar mb-6">
         <input
           type="search"
           placeholder="Search bills, sponsors, keywords…"
           value={search}
           onChange={(e) => setSearch(e.target.value)}
-          className="flex-1 border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-red-300"
+          className="ui-input"
         />
         <select
           value={topic}
           onChange={(e) => setTopic(e.target.value)}
-          className="border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-red-300"
+          className="ui-select sm:w-52 shrink-0"
         >
           <option>All</option>
           {TOPIC_TAGS.map((t) => (
@@ -57,14 +55,12 @@ export default function Home() {
         </select>
       </div>
 
-      {/* Results count */}
-      <p className="text-sm text-gray-400 mb-4">
+      <p className="ui-muted-count mb-4">
         Showing {filtered.length} of {bills.length} bills
       </p>
 
-      {/* Bill grid */}
       {filtered.length === 0 ? (
-        <div className="text-center py-16 text-gray-400">
+        <div className="ui-empty-state">
           No bills match your filters. Try broadening your search.
         </div>
       ) : (

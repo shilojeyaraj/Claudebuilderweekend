@@ -1,8 +1,8 @@
 import BillListingPage from '@/components/BillListingPage'
-import { getAllBills } from '@/lib/bills'
+import { getBills } from '@/lib/legisinfo'
 
-export default function SenateBillsPage() {
-  const bills = getAllBills().filter((bill) => bill.IsSenateBill)
+export default async function SenateBillsPage() {
+  const bills = (await getBills()).filter((bill) => bill.IsSenateBill)
 
   return (
     <BillListingPage

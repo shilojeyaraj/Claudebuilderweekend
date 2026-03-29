@@ -122,11 +122,11 @@ The system prompt is nonpartisan, grounded in the bill's LEGISinfo data, and ada
 ## Frontend — Pages
 
 ### `app/page.tsx` — Home
-Client component. Loads all bills from `lib/bills`, renders filterable grid.
+Client component. Loads all bills from static snapshot, renders filterable grid.
 Filters: free-text search, chamber (House/Senate/All), topic tag.
 
 ### `app/bills/[id]/page.tsx` — Bill Detail
-Server component. Renders:
+Async server component. Fetches live bill via `getLiveBillById`. Renders:
 - Bill header (code badge, title, sponsor, chamber, last activity)
 - Legislative progress bar (First Reading → Royal Assent)
 - Reading timestamps grid
@@ -135,12 +135,34 @@ Server component. Renders:
 - MP contact widget (`MPContactWidget`) — sidebar
 - LEGISinfo official source link — sidebar
 
+### `app/bills/house/page.tsx` — House Bills
+Async server component. Fetches live bills via `getBills()`, filters to `IsHouseBill`. Uses `BillListingPage`.
+
+### `app/bills/senate/page.tsx` — Senate Bills
+Async server component. Fetches live bills via `getBills()`, filters to `IsSenateBill`. Uses `BillListingPage`.
+
+### `app/bills/trending/page.tsx` — Trending Bills
+Async server component. Fetches live bills via `getBills()`, filters to those with activity in last 30 days. Uses `BillListingPage`.
+
+### `app/mp/page.tsx` — Find Your MP
+Server component. Full-page wrapper around `MPContactWidget` — standalone MP lookup without a specific bill.
+
 ---
 
 ## Frontend — Components
 
+### `ClientLayout.tsx`
+Client component wrapping the entire app. Provides:
+- Sticky header with logo and burger menu button
+- Collapsible sidebar with nav links (Home, Trending Bills, Find Your MP, House Bills, Senate Bills)
+- Sidebar hidden by default — opens/closes via burger toggle
+- Footer with data attribution
+
 ### `BillCard.tsx`
-Link card for the home page grid. Shows: bill code, topic badge, status badge, title, sponsor, last activity date.
+Link card for bill grids. Shows: bill code, topic badge, status badge, title, sponsor, last activity date.
+
+### `BillListingPage.tsx`
+Reusable server component for pre-filtered bill lists. Takes `{ title, description, bills, emptyMessage }`. Used by house/senate/trending pages.
 
 ### `ChatInterface.tsx`
 Streaming chat UI. Shows suggested questions before first message. Streams Claude's response chunk-by-chunk. Sends `{ messages, bill }` to `/api/chat`.
@@ -149,7 +171,7 @@ Streaming chat UI. Shows suggested questions before first message. Streams Claud
 Support/oppose vote buttons. Uses `localStorage` to prevent double-voting. Shows live percentage bar after vote.
 
 ### `MPContactWidget.tsx`
-Postal code form → Represent API lookup → MP card with photo, party, riding. Generates a pre-filled `mailto:` link with bill context.
+Postal code form → Represent API lookup → MP card with photo, party, riding. Generates a pre-filled `mailto:` link. Bill context (`billTitle`, `billNumber`) is optional — works standalone on `/mp` page.
 
 ---
 
