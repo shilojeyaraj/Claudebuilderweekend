@@ -15,7 +15,10 @@ export default function SentimentPoll({ billId }: { billId: number }) {
   // Restore prior vote from localStorage so users can't double-vote
   useEffect(() => {
     const stored = localStorage.getItem(`vote-${billId}`) as 'support' | 'oppose' | null
-    setVoted(stored)
+    if (stored) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
+      setVoted(stored)
+    }
     fetch(`/api/sentiment?billId=${billId}`)
       .then((r) => r.json())
       .then(setTally)
