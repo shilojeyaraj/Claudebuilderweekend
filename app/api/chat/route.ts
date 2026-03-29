@@ -23,24 +23,36 @@ Guidelines:
 - Be warm, accessible, and respectful of the user's ability to form their own opinion
 - Do not make up details about the bill that are not present in the data above`
 
-  const stream = await client.messages.create({
-    model: 'claude-haiku-4-5-20251001',
-    max_tokens: 1024,
-    system: systemPrompt,
-    messages,
-    stream: true,
-  })
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  let stream: any
+  try {
+    stream = await client.messages.create({
+      model: 'claude-haiku-4-5-20251001',
+      max_tokens: 1024,
+      system: systemPrompt,
+      messages,
+      stream: true,
+    })
+  } catch (err) {
+    console.error('[chat] Anthropic API error:', err)
+    return Response.json({ error: 'AI service unavailable' }, { status: 502 })
+  }
 
-  // Stream the response back as Server-Sent Events
+  // Stream the response back as plain text chunks
   const encoder = new TextEncoder()
   const readable = new ReadableStream({
     async start(controller) {
-      for await (const event of stream) {
-        if (event.type === 'content_block_delta' && event.delta.type === 'text_delta') {
-          controller.enqueue(encoder.encode(event.delta.text))
+      try {
+        for await (const event of stream) {
+          if (event.type === 'content_block_delta' && event.delta.type === 'text_delta') {
+            controller.enqueue(encoder.encode(event.delta.text))
+          }
         }
+      } catch (err) {
+        console.error('[chat] Stream error:', err)
+      } finally {
+        controller.close()
       }
-      controller.close()
     },
   })
 
