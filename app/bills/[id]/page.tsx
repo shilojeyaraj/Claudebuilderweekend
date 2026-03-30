@@ -1,7 +1,7 @@
 import { notFound } from 'next/navigation'
 import { getLiveBillById } from '@/lib/legisinfo'
 import { fetchOPBill } from '@/lib/openparliament'
-import { formatStatusLabel, getStatusBadgeClass, getTopicTag } from '@/lib/bills'
+import { formatStatusLabel, getBillDescription, getStatusBadgeClass, getTopicTag } from '@/lib/bills'
 import ChatInterface from '@/components/ChatInterface'
 import SentimentPoll from '@/components/SentimentPoll'
 import MPContactWidget from '@/components/MPContactWidget'
@@ -42,6 +42,7 @@ export default async function BillPage({ params }: { params: Promise<{ id: strin
   const statusLabel = formatStatusLabel(
     bill.LatestCompletedMajorStageNameWithChamberSuffix || bill.StatusNameEn
   )
+  const description = getBillDescription(enrichedBill)
   const topic = getTopicTag(bill)
 
   const lastActivity = new Date(bill.LatestBillEventDateTime).toLocaleDateString('en-CA', {
@@ -71,9 +72,7 @@ export default async function BillPage({ params }: { params: Promise<{ id: strin
             <h1 className="ui-page-title leading-snug mb-1">
               {bill.ShortTitleEn || bill.LongTitleEn}
             </h1>
-            {bill.ShortTitleEn && (
-              <p className="ui-prose-muted mb-4">{bill.LongTitleEn}</p>
-            )}
+            <p className="ui-prose-muted mb-4">{description}</p>
 
             <div className="flex flex-wrap gap-4 text-sm ui-prose-muted">
               <span>

@@ -104,7 +104,7 @@ export function InterestsButton({
                 className="ui-input min-h-24 resize-y"
               />
               <p className="ui-legal">
-                Use a few words or short phrases. Matching bills will rise within your preferred categories.
+                Separate terms with commas. Use a few words or short phrases, and matching bills will rise within your preferred categories.
               </p>
             </div>
 

@@ -1,6 +1,6 @@
 import Link from 'next/link'
 import { Bill } from '@/lib/types'
-import { formatStatusLabel, getStatusBadgeClass, getTopicTag } from '@/lib/bills'
+import { formatStatusLabel, getBillDescription, getStatusBadgeClass, getTopicTag } from '@/lib/bills'
 
 export default function BillCard({ bill }: { bill: Bill }) {
   const topicTag = getTopicTag(bill)
@@ -8,6 +8,7 @@ export default function BillCard({ bill }: { bill: Bill }) {
   const statusLabel = formatStatusLabel(
     bill.LatestCompletedMajorStageNameWithChamberSuffix || bill.StatusNameEn
   )
+  const description = getBillDescription(bill)
   const lastActivity = new Date(bill.LatestBillEventDateTime).toLocaleDateString('en-CA', {
     year: 'numeric',
     month: 'short',
@@ -31,7 +32,7 @@ export default function BillCard({ bill }: { bill: Bill }) {
         <h2 className="ui-title-link mb-1">
           {bill.ShortTitleEn || bill.LongTitleEn}
         </h2>
-        <p className="text-sm ui-prose-muted ui-line-clamp-2 mb-3">{bill.LongTitleEn}</p>
+        <p className="text-sm ui-prose-muted ui-line-clamp-3 mb-3">{description}</p>
 
         <div className="flex items-center justify-between ui-bill-meta">
           <span>

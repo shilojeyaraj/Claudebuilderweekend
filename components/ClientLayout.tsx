@@ -55,7 +55,7 @@ function ClientLayoutInner({ children }: { children: React.ReactNode }) {
         <div className="flex flex-1 flex-col gap-2 min-w-0 sm:flex-row sm:items-center sm:gap-4">
           <div className="flex items-center min-w-0 gap-1">
             <Image
-              src="/logo.png"
+              src="/logo-transparent.png"
               alt=""
               width={112}
               height={112}

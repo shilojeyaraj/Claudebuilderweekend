@@ -39,7 +39,7 @@ export function sanitizeUserInterests(value: Partial<UserInterests> | null | und
 
   return {
     topics: [...new Set(topics)],
-    customText: typeof value?.customText === 'string' ? value.customText.trim() : '',
+    customText: typeof value?.customText === 'string' ? value.customText : '',
   }
 }
 
@@ -48,7 +48,7 @@ export function extractInterestKeywords(customText: string): string[] {
   if (!normalized) return []
 
   const phrases = normalized
-    .split(/[\n,;]+/)
+    .split(/[,\n]+/)
     .map((phrase) => phrase.trim())
     .filter((phrase) => phrase.length >= 3)
 
@@ -60,6 +60,28 @@ export function extractInterestKeywords(customText: string): string[] {
   }
 
   return [...keywords]
+}
+
+export function getDisplayInterestKeywords(customText: string): string[] {
+  const keywords = extractInterestKeywords(customText)
+  const phrases = keywords.filter((keyword) => keyword.includes(' '))
+
+  if (phrases.length === 0) {
+    return keywords
+  }
+
+  return keywords.filter((keyword) => {
+    if (keyword.includes(' ')) {
+      return true
+    }
+
+    return !phrases.some((phrase) =>
+      phrase
+        .split(/\s+/)
+        .map((word) => word.trim())
+        .includes(keyword)
+    )
+  })
 }
 
 export function getBillInterestMatchScore(bill: Bill, customText: string): number {
