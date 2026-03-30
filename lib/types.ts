@@ -53,4 +53,5 @@ export interface MPResult {
  */
 export interface UserInterests {
   topics: string[]
+  customText: string
 }

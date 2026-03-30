@@ -3,6 +3,7 @@
 import { useState, useRef, useEffect } from 'react'
 import ReactMarkdown from 'react-markdown'
 import { Bill } from '@/lib/types'
+import { useInterests } from '@/components/InterestsProvider'
 
 interface Message {
   role: 'user' | 'assistant'
@@ -21,6 +22,7 @@ export default function ChatInterface({ bill }: { bill: Bill }) {
   const [input, setInput] = useState('')
   const [isLoading, setIsLoading] = useState(false)
   const bottomRef = useRef<HTMLDivElement>(null)
+  const { userInterests } = useInterests()
 
   useEffect(() => {
     bottomRef.current?.scrollIntoView({ behavior: 'smooth' })
@@ -41,7 +43,7 @@ export default function ChatInterface({ bill }: { bill: Bill }) {
       const res = await fetch('/api/chat', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ messages: nextMessages, bill }),
+        body: JSON.stringify({ messages: nextMessages, bill, userInterests }),
       })
 
       if (!res.ok || !res.body) throw new Error('Chat request failed')

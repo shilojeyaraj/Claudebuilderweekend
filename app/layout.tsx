@@ -1,5 +1,4 @@
 import type { Metadata } from "next";
-import Script from "next/script";
 import {
   Baloo_2,
   DM_Serif_Display,
@@ -14,13 +13,8 @@ import {
   Tenor_Sans,
 } from "next/font/google";
 import "./globals.css";
-import { ThemeProvider } from "@/components/ThemeProvider";
 import { ClientLayout } from "@/components/ClientLayout";
-import {
-  DEFAULT_UI_THEME,
-  UI_THEME_STORAGE_KEY,
-  UI_THEMES,
-} from "@/lib/ui-themes";
+import { DEFAULT_UI_THEME } from "@/lib/ui-themes";
 
 const geistMono = Geist_Mono({
   variable: "--font-geist-mono",
@@ -96,21 +90,6 @@ const fontVariables = [
   figtree.variable,
 ].join(" ");
 
-const themeBootScript = `
-(function(){
-  var k=${JSON.stringify(UI_THEME_STORAGE_KEY)};
-  var allowed=${JSON.stringify(UI_THEMES.map((t) => t.id))};
-  var def=${JSON.stringify(DEFAULT_UI_THEME)};
-  try{
-    var v=localStorage.getItem(k);
-    document.documentElement.dataset.uiTheme =
-      v && allowed.indexOf(v)>=0 ? v : def;
-  }catch(e){
-    document.documentElement.dataset.uiTheme=def;
-  }
-})();
-`;
-
 export const metadata: Metadata = {
   title: "Parliament Watch — Canadian Bill Tracker",
   description:
@@ -130,12 +109,7 @@ export default function RootLayout({
       suppressHydrationWarning
     >
       <body className="min-h-full flex flex-col">
-        <Script id="ui-theme-boot" strategy="beforeInteractive">
-          {themeBootScript}
-        </Script>
-        <ThemeProvider>
-          <ClientLayout>{children}</ClientLayout>
-        </ThemeProvider>
+        <ClientLayout>{children}</ClientLayout>
       </body>
     </html>
   );

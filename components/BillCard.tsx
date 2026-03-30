@@ -1,10 +1,13 @@
 import Link from 'next/link'
 import { Bill } from '@/lib/types'
-import { getStatusBadgeClass, getTopicTag } from '@/lib/bills'
+import { formatStatusLabel, getStatusBadgeClass, getTopicTag } from '@/lib/bills'
 
 export default function BillCard({ bill }: { bill: Bill }) {
   const topicTag = getTopicTag(bill)
   const statusClass = getStatusBadgeClass(bill.StatusNameEn)
+  const statusLabel = formatStatusLabel(
+    bill.LatestCompletedMajorStageNameWithChamberSuffix || bill.StatusNameEn
+  )
   const lastActivity = new Date(bill.LatestBillEventDateTime).toLocaleDateString('en-CA', {
     year: 'numeric',
     month: 'short',
@@ -22,9 +25,7 @@ export default function BillCard({ bill }: { bill: Bill }) {
               <span className="ui-tag-muted">Gov&apos;t Bill</span>
             )}
           </div>
-          <span className={statusClass}>
-            {bill.LatestCompletedMajorStageNameWithChamberSuffix || bill.StatusNameEn}
-          </span>
+          <span className={statusClass}>{statusLabel}</span>
         </div>
 
         <h2 className="ui-title-link mb-1">

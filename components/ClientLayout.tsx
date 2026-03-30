@@ -3,7 +3,8 @@
 import React, { useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
-import { ThemeSwitcher } from "@/components/ThemeSwitcher";
+import { InterestsProvider } from "@/components/InterestsProvider";
+import { InterestsButton } from "@/components/InterestsButton";
 
 const NAV_ITEMS = [
   { href: "/", label: "Home" },
@@ -14,6 +15,14 @@ const NAV_ITEMS = [
 ];
 
 export function ClientLayout({ children }: { children: React.ReactNode }) {
+  return (
+    <InterestsProvider>
+      <ClientLayoutInner>{children}</ClientLayoutInner>
+    </InterestsProvider>
+  );
+}
+
+function ClientLayoutInner({ children }: { children: React.ReactNode }) {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 
   return (
@@ -62,10 +71,7 @@ export function ClientLayout({ children }: { children: React.ReactNode }) {
           </div>
 
           <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-4 sm:ml-auto w-full sm:w-auto min-w-0">
-            <ThemeSwitcher />
-            <span className="ui-legal whitespace-nowrap hidden lg:inline opacity-80">
-              45th Parliament · Live data
-            </span>
+            <InterestsButton />
           </div>
         </div>
       </header>
@@ -100,6 +106,12 @@ export function ClientLayout({ children }: { children: React.ReactNode }) {
                   </Link>
                 </li>
               ))}
+              <li>
+                <InterestsButton
+                  variant="sidebar"
+                  onOpen={() => setIsSidebarOpen(false)}
+                />
+              </li>
             </ul>
           </nav>
           <div className="p-4 border-t border-[var(--ui-sidebar-border)] ui-legal">

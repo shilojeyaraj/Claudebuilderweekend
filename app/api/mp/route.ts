@@ -9,8 +9,8 @@ export async function GET(req: Request) {
     return Response.json({ error: 'Invalid Canadian postal code' }, { status: 400 })
   }
 
-  const res = await fetch(
-    `https://represent.opennorth.ca/representatives/?postal_code=${postalCode}&sets=federal-electoral-districts`,
+  const postcodeRes = await fetch(
+    `https://represent.opennorth.ca/postcodes/${postalCode}/?sets=federal-electoral-districts`,
     {
       headers: {
         'User-Agent': 'ParliamentWatch/1.0 (hackathon demo)',
@@ -19,17 +19,35 @@ export async function GET(req: Request) {
     }
   )
 
-  if (!res.ok) {
+  if (!postcodeRes.ok) {
     return Response.json({ error: 'Could not reach Represent API' }, { status: 502 })
   }
 
-  const data = await res.json()
+  const postcodeData = await postcodeRes.json()
+  const coordinates = postcodeData?.centroid?.coordinates
 
-  // Filter to House of Commons MPs only (elected_office = "MP")
-  const mp = (data.objects ?? []).find(
-    (r: { elected_office: string }) =>
-      r.elected_office === 'MP'
+  if (!Array.isArray(coordinates) || coordinates.length < 2) {
+    return Response.json({ error: 'No MP found for that postal code' }, { status: 404 })
+  }
+
+  const [longitude, latitude] = coordinates
+
+  const mpRes = await fetch(
+    `https://represent.opennorth.ca/representatives/house-of-commons/?point=${latitude},${longitude}`,
+    {
+      headers: {
+        'User-Agent': 'ParliamentWatch/1.0 (hackathon demo)',
+        Accept: 'application/json',
+      },
+    }
   )
+
+  if (!mpRes.ok) {
+    return Response.json({ error: 'Could not reach Represent API' }, { status: 502 })
+  }
+
+  const data = await mpRes.json()
+  const mp = (data.objects ?? []).find((r: { elected_office?: string }) => r.elected_office === 'MP')
 
   if (!mp) {
     return Response.json({ error: 'No MP found for that postal code' }, { status: 404 })

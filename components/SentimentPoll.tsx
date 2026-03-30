@@ -44,7 +44,7 @@ export default function SentimentPoll({ billId }: { billId: number }) {
 
   return (
     <div className="ui-card ui-card-pad">
-      <h3 className="ui-section-title text-sm mb-1">What do Canadians think?</h3>
+      <h3 className="ui-section-title text-sm mb-1">What do Parliament Watch users think?</h3>
       <p className="ui-legal mb-4">Anonymous · one vote per bill</p>
 
       {!voted ? (

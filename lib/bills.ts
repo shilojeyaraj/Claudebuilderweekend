@@ -15,6 +15,31 @@ export function getBillById(id: number): Bill | undefined {
   return bills.find((b) => b.Id === id)
 }
 
+const STATUS_LABEL_OVERRIDES: Record<string, string> = {
+  HouseAt2ndReading: 'House at 2nd Reading',
+  SenateAt2ndReading: 'Senate at 2nd Reading',
+  SenateAt3rdReading: 'Senate at 3rd Reading',
+  HouseAtReportStage: 'House at Report Stage',
+  SenateAtReportStage: 'Senate at Report Stage',
+  OutsideOrderPrecedence: 'Outside Order of Precedence',
+  "Outside the Order of Precedence (a private member's bill that hasn't yet won the draw that determines which private member's bills can be debated)":
+    'Outside Order of Precedence',
+  SenateBillWaitingHouse: 'Senate Bill Awaiting House',
+  BillDefeated: 'Bill Defeated',
+  ProForma: 'Pro Forma',
+}
+
+export function formatStatusLabel(label: string): string {
+  if (!label) return label
+  if (STATUS_LABEL_OVERRIDES[label]) return STATUS_LABEL_OVERRIDES[label]
+
+  return label
+    .replace(/([a-z])([A-Z])/g, '$1 $2')
+    .replace(/([A-Za-z])(\d+(?:st|nd|rd|th))/g, '$1 $2')
+    .replace(/(\d+(?:st|nd|rd|th))([A-Z])/g, '$1 $2')
+    .trim()
+}
+
 // Derive a rough topic tag from the bill title for client-side filtering.
 // LEGISinfo doesn't include subject classifications, so we keyword-match the long title.
 export function getTopicTag(bill: Bill): string {

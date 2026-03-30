@@ -14,11 +14,16 @@ export async function POST(req: Request) {
     userInterests?: UserInterests
   } = await req.json()
 
-  // Build the interests block only when topics are provided
-  const interestsBlock =
+  const interestsNotes = [
     userInterests?.topics?.length
-      ? `\nThe user has indicated they care especially about: ${userInterests.topics.join(', ')}. Where relevant, connect your explanation to those areas.`
-      : ''
+      ? `The user cares especially about these policy areas: ${userInterests.topics.join(', ')}.`
+      : null,
+    userInterests?.customText?.trim()
+      ? `The user also mentioned these recurring interests or concerns: ${userInterests.customText.trim()}.`
+      : null,
+  ].filter(Boolean)
+
+  const interestsBlock = interestsNotes.length > 0 ? `\n${interestsNotes.join('\n')}` : ''
 
   // Build a compact, readable bill summary for the system prompt
   const billContext = [
