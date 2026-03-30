@@ -8,7 +8,8 @@
     "start": "next start",
     "lint": "eslint",
     "fetch-bills": "node scripts/fetch-bills.mjs",
-    "enrich-bills": "node scripts/enrich-bills-from-legisinfo.mjs"
+    "enrich-bills": "node scripts/enrich-bills-from-legisinfo.mjs",
+    "generate-bill-summaries": "node scripts/generate-bill-summaries.mjs"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.80.0",

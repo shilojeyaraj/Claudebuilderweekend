@@ -1,5 +1,5 @@
 import Anthropic from '@anthropic-ai/sdk'
-import { stripHtmlToText } from '@/lib/bills'
+import { getBillDescription, stripHtmlToText } from '@/lib/bills'
 import { Bill, UserInterests } from '@/lib/types'
 
 const client = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY })
@@ -31,6 +31,7 @@ export async function POST(req: Request) {
     `Number: ${bill.NumberCode}`,
     `Short title: ${bill.ShortTitleEn || '(none)'}`,
     `Long title: ${bill.LongTitleEn}`,
+    `Brief summary: ${getBillDescription(bill, 320)}`,
     bill.ShortLegislativeSummaryEn
       ? `Legislative summary: ${stripHtmlToText(bill.ShortLegislativeSummaryEn)}`
       : null,

@@ -1,5 +1,6 @@
 import { Bill } from './types'
 import billsData from '../public/bills.json'
+import { PREWRITTEN_BILL_SUMMARIES } from './bill-summaries.generated'
 
 const bills = billsData as Bill[]
 const SUMMARY_MAX_LENGTH = 220
@@ -41,6 +42,10 @@ export function stripHtmlToText(value: string): string {
     .trim()
 }
 
+export function getPrewrittenBillSummary(numberCode: string): string | null {
+  return PREWRITTEN_BILL_SUMMARIES[numberCode] ?? null
+}
+
 function truncateText(text: string, maxLength: number): string {
   if (text.length <= maxLength) return text
   const truncated = text.slice(0, maxLength).replace(/[ ,;:]+$/g, '')
@@ -71,6 +76,11 @@ function summarizeTitleAsDescription(bill: Bill): string {
 }
 
 export function getBillDescription(bill: Bill, maxLength = SUMMARY_MAX_LENGTH): string {
+  const prewrittenSummary = getPrewrittenBillSummary(bill.NumberCode)
+  if (prewrittenSummary) {
+    return truncateText(prewrittenSummary, maxLength)
+  }
+
   const summarySource = bill.ShortLegislativeSummaryEn
     ? stripHtmlToText(bill.ShortLegislativeSummaryEn)
     : ''
